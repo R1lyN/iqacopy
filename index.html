@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cylinder Clipboard Tool</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .cylinder-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .cylinder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .cylinder label {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .cylinder input {
+      width: 80px;
+      text-align: center;
+      margin-bottom: 8px;
+      padding: 5px;
+      font-size: 1em;
+      text-transform: uppercase; /* Makes it appear uppercase visually */
+    }
+    .cylinder button {
+      background: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .cylinder button:hover {
+      background: #005fa3;
+    }
+    .save-button {
+      margin-top: 25px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background 0.2s;
+    }
+    .save-button:hover {
+      background: #1e7e34;
+    }
+    .message {
+      margin-top: 15px;
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cylinder Clipboard Tool</h1>
+  <div class="cylinder-grid">
+    <div class="cylinder"><label>Cylinder 1</label><input id="cyl1" type="text"><button onclick="copyText(1)">Copy</button></div>
+    <div class="cylinder"><label>Cylinder 2</label><input id="cyl2" type="text"><button onclick="copyText(2)">Copy</button></div>
+    <div class="cylinder"><label>Cylinder 3</label><input id="cyl3" type="text"><button onclick="copyText(3)">Copy</button></div>
+    <div class="cylinder"><label>Cylinder 4</label><input id="cyl4" type="text"><button onclick="copyText(4)">Copy</button></div>
+    <div class="cylinder"><label>Cylinder 5</label><input id="cyl5" type="text"><button onclick="copyText(5)">Copy</button></div>
+    <div class="cylinder"><label>Cylinder 6</label><input id="cyl6" type="text"><button onclick="copyText(6)">Copy</button></div>
+    <div class="cylinder"><label>Cylinder 7</label><input id="cyl7" type="text"><button onclick="copyText(7)">Copy</button></div>
+    <div class="cylinder"><label>Cylinder 8</label><input id="cyl8" type="text"><button onclick="copyText(8)">Copy</button></div>
+  </div>
+
+  <button class="save-button" onclick="saveToXML()">💾 Save to XML</button>
+  <div id="message" class="message"></div>
+
+  <script>
+    // Convert input to uppercase as the user types
+    document.querySelectorAll("input[type='text']").forEach(input => {
+      input.addEventListener("input", () => {
+        input.value = input.value.toUpperCase();
+      });
+    });
+
+    function copyText(cylinder) {
+      const input = document.getElementById(`cyl${cylinder}`);
+      const text = input.value.trim();
+      if (text === "") {
+        showMessage(`Cylinder ${cylinder} is empty.`, "red");
+        return;
+      }
+      navigator.clipboard.writeText(text).then(() => {
+        showMessage(`Copied Cylinder ${cylinder}: "${text}"`, "green");
+      }).catch(() => {
+        showMessage("Clipboard copy failed.", "red");
+      });
+    }
+
+    function showMessage(msg, color) {
+      const messageDiv = document.getElementById("message");
+      messageDiv.textContent = msg;
+      messageDiv.style.color = color;
+      setTimeout(() => messageDiv.textContent = "", 2000);
+    }
+
+    function saveToXML() {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<Cylinders>\n';
+      for (let i = 1; i <= 8; i++) {
+        const val = document.getElementById(`cyl${i}`).value.trim();
+        xml += `  <Cylinder id="${i}">${val}</Cylinder>\n`;
+      }
+      xml += '</Cylinders>';
+
+      // Create and download the XML
+      const blob = new Blob([xml], { type: 'application/xml' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'cylinders.xml';
+      link.click();
+      URL.revokeObjectURL(link.href);
+
+      showMessage("XML file saved.", "green");
+    }
+  </script>
+</body>
+</html>
